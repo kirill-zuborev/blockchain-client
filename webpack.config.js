@@ -24,7 +24,7 @@ module.exports = (env) => {
         ]
     });
 
-    const clientBundleOutputDir = './wwwroot';
+    const clientBundleOutputDir = '../wwwroot';
     const clientBundleConfig = merge(sharedConfig(), {
         entry: { 'app': './Client/index.tsx' },
         module: {
@@ -39,7 +39,7 @@ module.exports = (env) => {
             new ExtractTextPlugin('site.css'),
             new webpack.DllReferencePlugin({
                 context: __dirname,
-                manifest: require('./wwwroot/dist/vendor-manifest.json')
+                manifest: require(`${clientBundleOutputDir}/dist/vendor-manifest.json`)
             }),
         ].concat(isDevBuild ? [
             new webpack.SourceMapDevToolPlugin({
