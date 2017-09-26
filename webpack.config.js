@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
 const merge = require('webpack-merge');
@@ -24,14 +25,34 @@ module.exports = (env) => {
         ]
     });
 
+    const htmlConfig = () => ({
+        stats: { modules: false },
+        resolve: { extensions: ['.html'] },
+        output: {
+            publicPath: '/'
+        },
+        module: {
+            rules: [
+                { test: /\.html$/, loader: 'raw-loader' }
+            ]
+        },
+        plugins: [
+            new HtmlWebpackPlugin({
+                filename: 'index.html',
+                inject: 'body',
+                template: 'Client/index.html'
+            })
+        ]
+    });
+
     const clientBundleOutputDir = '../wwwroot';
-    const clientBundleConfig = merge(sharedConfig(), {
+    const clientBundleConfig = merge(sharedConfig(), htmlConfig(), {
         entry: { 'app': './Client/index.tsx' },
         module: {
             rules: [
                 { test: /\.css$/, use: ExtractTextPlugin.extract({ use: isDevBuild ? 'css-loader' : 'css-loader?minimize' }) },
                 { test: /\.less$/, exclude: /node_modules/, loaders: ['style-loader', 'css-loader', 'less-loader'] },
-                { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' },
+                { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' }
             ]
         },
         output: { path: path.join(__dirname, clientBundleOutputDir) },
